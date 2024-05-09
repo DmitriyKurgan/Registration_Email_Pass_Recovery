@@ -1,5 +1,5 @@
-import {usersAccoutsCollection, usersCollection} from "./db";
-import {InsertOneResult, ObjectId, DeleteResult} from "mongodb";
+import {usersAccoutsCollection} from "./db";
+import {InsertOneResult, ObjectId, DeleteResult, UpdateResult} from "mongodb";
 import {OutputUserAccountType, OutputUserType, UserAccountDBType} from "../utils/types";
 import {UserAccountMapper} from "./query-repositories/auth-query-repository";
 
@@ -12,6 +12,10 @@ export const authRepository = {
    async deleteUser(userID:string): Promise<boolean>{
         const result: DeleteResult = await usersAccoutsCollection.deleteOne({_id:new ObjectId(userID)});
         return result.deletedCount === 1
+    },
+    async updateConfirmation(userID:ObjectId):Promise<boolean>{
+        const result: UpdateResult = await usersAccoutsCollection.updateOne({_id:userID},
+            {$set:{'emailConfirmation.isConfirmed':true}});
+        return result.matchedCount === 1
     }
-
 }

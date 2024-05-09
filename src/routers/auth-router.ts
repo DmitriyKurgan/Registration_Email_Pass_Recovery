@@ -12,7 +12,9 @@ import {usersQueryRepository} from "../repositories/query-repositories/users-que
 import { emailManager} from "../managers/email-adapter";
 import {authService} from "../services/auth-service";
 import SMTPTransport from "nodemailer/lib/smtp-transport";
-import {OutputUserAccountType} from "../utils/types";
+import {OutputUserAccountType, UserAccountDBType} from "../utils/types";
+import {authQueryRepository} from "../repositories/query-repositories/auth-query-repository";
+import {WithId} from "mongodb";
 
 export const authRouter = Router({});
 
@@ -46,7 +48,12 @@ authRouter.post('/registration',
        res.sendStatus(CodeResponsesEnum.Not_content_204)
 });
 authRouter.post('/registration-confirmation', validateRegistrationConfirmationRequests, validateErrorsMiddleware, async (req: Request, res: Response) => {
-
+    const confirmationCode = req.body.confirmationCode;
+    const confirmationResult = authService.confirmRegistration(confirmationCode);
+    if (!confirmationResult){
+        return res.sendStatus(CodeResponsesEnum.Incorrect_values_400);
+    }
+    res.sendStatus(CodeResponsesEnum.Not_content_204);
 });
 authRouter.post('/registration-email-resending', validateEmailResendingRequests, validateErrorsMiddleware, async (req: Request, res: Response) => {
 

@@ -6,6 +6,7 @@ import {usersQueryRepository} from "../repositories/query-repositories/users-que
 import {v4 as uuidv4} from 'uuid'
 import {add} from "date-fns/add";
 import {authRepository} from "../repositories/auth-repository";
+import {authQueryRepository} from "../repositories/query-repositories/auth-query-repository";
 export const users = [] as OutputUserType[]
 
 export const authService:any = {
@@ -39,16 +40,16 @@ export const authService:any = {
    async deleteUser(userID:string): Promise<boolean>{
        return await authRepository.deleteUser(userID);
     },
-    async checkCredentials(loginOrEmail:string, password:string):Promise<WithId<UserDBType> | null>{
-        const user:WithId<UserDBType> | null = await usersQueryRepository.findByLoginOrEmail(loginOrEmail);
-        if (!user){
-            return null
-        }
-        const passwordHash = await this._generateHash(password, user.passwordSalt);
-        if (user.passwordHash !== passwordHash){
-            return null
-        }
-        return user
+    async confirmRegistration(confirmationCode:string):Promise<boolean>{
+        const userAccount:WithId<UserAccountDBType> | null = await authQueryRepository.findUserByEmailConfirmationCode(confirmationCode);
+        if (!userAccount) return false;
+        if (userAccount.emailConfirmation.isConfirmed) return false;
+        if (userAccount.emailConfirmation.confirmationCode !== confirmationCode) return false;
+        if (userAccount.emailConfirmation.expirationDate < new Date()) return false;
+
+        const result = await authRepository.updateConfirmation(userAccount._id);
+        return result
+
     },
     async _generateHash(password:string, salt:string):Promise<string>{
         const hash = await bcrypt.hash(password, salt);
