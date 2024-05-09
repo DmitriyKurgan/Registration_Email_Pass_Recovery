@@ -47,7 +47,7 @@ authRouter.post('/registration',
             await authService.deleteUser(userAccount.id);
             return res.sendStatus(CodeResponsesEnum.Not_found_404)
         }
-       res.status(CodeResponsesEnum.Not_content_204).send(userAccount.emailConfirmation.confirmationCode)
+       res.status(CodeResponsesEnum.OK_200).send(userAccount.emailConfirmation.confirmationCode)
 });
 authRouter.post('/registration-confirmation', validateRegistrationConfirmationRequests, validateErrorsMiddleware, async (req: Request, res: Response) => {
     const confirmationCode = req.body.confirmationCode;
