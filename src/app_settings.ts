@@ -7,7 +7,6 @@ import {authRouter} from "./routers/auth-router";
 import {commentsRouter} from "./routers/comments-router";
 import {testingRouter} from "./routers/testing-router";
 
-
 export const app = express();
 
 app.use(express.json());

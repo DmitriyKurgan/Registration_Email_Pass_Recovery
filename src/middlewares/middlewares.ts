@@ -136,6 +136,7 @@ export const validateUsersRequests = [
         .withMessage("Email must be in correct format")
 ];
 
+
 export const validateAuthRequests = [
     body("loginOrEmail")
         .exists()
@@ -174,6 +175,26 @@ export const validateCommentsRequests = [
             "cContent length must be more than 20 and less than or equal to 300 symbols"
         ),
    ];
+
+export const validateRegistrationConfirmationRequests = [
+    body("code")
+        .exists()
+        .withMessage("Confirmation code is required")
+        .isString()
+        .withMessage("Type of confirmation code must be a string")
+        .trim()
+];
+
+export const validateEmailResendingRequests = [
+    body("email")
+        .exists()
+        .withMessage("Email is required")
+        .isString()
+        .withMessage("Type of email must be a string")
+        .trim()
+        .matches(emailpattern)
+        .withMessage("Email must be in correct format")
+]
 
 export const validationBlogsFindByParamId = param("id").custom(
     async (value) => {
