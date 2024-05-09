@@ -33,20 +33,20 @@ authRouter.post('/registration',
      validationUserUnique("login"),
      validateErrorsMiddleware,
     async (req: Request, res: Response) => {
-    debugger
         const userAccount:OutputUserAccountType | null = await authService.createUser(req.body.login, req.body.email, req.body.password);
         if (!userAccount){
-            return res.sendStatus(CodeResponsesEnum.Not_found_404)
+          return res.sendStatus(CodeResponsesEnum.Not_found_404)
         }
-        const messageText = `Hello, ${userAccount.accountData.userName}! We are pleased to welcome you to our website. All you need to do is to confirm your registration.`
+        const messageText = `Hello, ${userAccount.accountData.userName}! 
+        We are pleased to welcome you to our website. All you need to do is to confirm your registration. 
+        Put this conformation code ${userAccount.emailConfirmation.confirmationCode} to correct field`
         try {
-            const gmailResponse:SMTPTransport.SentMessageInfo = await emailManager.sendEmail(userAccount.accountData.email, userAccount.emailConfirmation.confirmationCode!, messageText );
+          const gmailResponse:SMTPTransport.SentMessageInfo = await emailManager.sendEmail(userAccount.accountData.email, userAccount.emailConfirmation.confirmationCode!, messageText );
         } catch (error) {
             console.error(error);
             await authService.deleteUser(userAccount.id);
             return res.sendStatus(CodeResponsesEnum.Not_found_404)
         }
-
        res.sendStatus(CodeResponsesEnum.Not_content_204)
 });
 authRouter.post('/registration-confirmation', validateRegistrationConfirmationRequests, validateErrorsMiddleware, async (req: Request, res: Response) => {

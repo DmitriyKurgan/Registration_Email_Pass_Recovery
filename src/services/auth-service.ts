@@ -34,7 +34,6 @@ export const authService:any = {
                 isConfirmed:false,
             },
         }
-        debugger
         const createdAccountUser:OutputUserAccountType | null = await authRepository.createUser(newUser);
         return createdAccountUser;
     },

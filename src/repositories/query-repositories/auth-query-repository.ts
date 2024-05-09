@@ -18,7 +18,6 @@ export const authQueryRepository = {
         return user
     },
     async findByLoginOrEmail(loginOrEmail:string){
-        debugger
         const userAccount = await usersAccoutsCollection.findOne({$or: [{"accountData.userName":loginOrEmail}, {"accountData.email":loginOrEmail}]})
         return userAccount
     },
