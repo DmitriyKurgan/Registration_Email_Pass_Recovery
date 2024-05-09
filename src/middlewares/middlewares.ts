@@ -306,6 +306,7 @@ export const validationPostsCreation = body("blogId").custom(async (value) => {
 
 export const validationUserUnique = (field: string) =>
     body(field).custom(async (value) => {
+        debugger
         const result = await authQueryRepository.findByLoginOrEmail(value);
         if (result) {
             throw new Error("User already registered");
