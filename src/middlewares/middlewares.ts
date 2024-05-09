@@ -5,6 +5,8 @@ import {usersQueryRepository} from "../repositories/query-repositories/users-que
 import {commentsQueryRepository} from "../repositories/query-repositories/comments-query-repository";
 import {CodeResponsesEnum} from "../utils/utils";
 import {jwtService} from "../application/jwt-service";
+import {authService} from "../services/auth-service";
+import {authQueryRepository} from "../repositories/query-repositories/auth-query-repository";
 const websiteUrlPattern =
     /^https:\/\/([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*\/?$/;
 const loginPattern =
@@ -301,3 +303,12 @@ export const validationPostsCreation = body("blogId").custom(async (value) => {
     }
     return true;
 });
+
+export const validationUserUnique = (field: string) =>
+    body(field).custom(async (value) => {
+        const result = await authQueryRepository.findByLoginOrEmail(value);
+        if (result) {
+            throw new Error("User already registered");
+        }
+        return true;
+    });

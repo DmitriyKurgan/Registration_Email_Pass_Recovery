@@ -19,9 +19,9 @@ export const authQueryRepository = {
     async findUserByEmailConfirmationCode(confirmationCode:string){
         const user:WithId<UserAccountDBType> | null = await usersAccoutsCollection.findOne({"emailConfirmation.confirmationCode":confirmationCode})
         return user
-},
-    async findUserByID(userID:string){
-        const user = await usersCollection.findOne({_id: new ObjectId(userID)})
-        return user
-    }
+    },
+    async findByLoginOrEmail(loginOrEmail:string){
+        const userAccount = await usersAccoutsCollection.findOne({$or: [{login:loginOrEmail}, {email:loginOrEmail}]})
+        return userAccount
+    },
 }
