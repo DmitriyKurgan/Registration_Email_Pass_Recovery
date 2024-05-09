@@ -44,7 +44,7 @@ authRouter.post('/registration',
         } catch (error) {
             console.error(error);
             await authService.deleteUser(userAccount.id);
-            return null;
+            return res.sendStatus(CodeResponsesEnum.Not_found_404)
         }
 
        res.sendStatus(CodeResponsesEnum.Not_content_204)
