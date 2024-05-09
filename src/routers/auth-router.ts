@@ -33,6 +33,7 @@ authRouter.post('/registration',
      validationUserUnique("login"),
      validateErrorsMiddleware,
     async (req: Request, res: Response) => {
+    debugger
         const userAccount:OutputUserAccountType | null = await authService.createUser(req.body.login, req.body.email, req.body.password);
         if (!userAccount){
             return res.sendStatus(CodeResponsesEnum.Not_found_404)

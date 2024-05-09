@@ -13,15 +13,13 @@ export const UserAccountMapper = (user : WithId<UserAccountDBType>) : OutputUser
 
 
 export const authQueryRepository = {
-    async getAllUsers(query: any): Promise<any | { error: string }> {
-        return getUsersFromDB(query);
-    },
     async findUserByEmailConfirmationCode(confirmationCode:string){
         const user:WithId<UserAccountDBType> | null = await usersAccoutsCollection.findOne({"emailConfirmation.confirmationCode":confirmationCode})
         return user
     },
     async findByLoginOrEmail(loginOrEmail:string){
-        const userAccount = await usersAccoutsCollection.findOne({$or: [{login:loginOrEmail}, {email:loginOrEmail}]})
+        debugger
+        const userAccount = await usersAccoutsCollection.findOne({$or: [{"accountData.userName":loginOrEmail}, {"accountData.email":loginOrEmail}]})
         return userAccount
     },
 }
