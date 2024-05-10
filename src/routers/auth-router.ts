@@ -9,7 +9,7 @@ import {
 } from "../middlewares/middlewares";
 import {jwtService} from "../application/jwt-service";
 import {usersQueryRepository} from "../repositories/query-repositories/users-query-repository";
-import { emailManager} from "../managers/email-adapter";
+import { emailManager} from "../managers/email-manager";
 import {authService} from "../services/auth-service";
 import SMTPTransport from "nodemailer/lib/smtp-transport";
 import {OutputUserAccountType, UserAccountDBType} from "../utils/types";
@@ -41,13 +41,15 @@ authRouter.post('/registration',
         We are pleased to welcome you to our website. All you need to do is to confirm your registration. 
         Put this conformation code ${userAccount.emailConfirmation.confirmationCode} to correct field`
         try {
-          const gmailResponse:SMTPTransport.SentMessageInfo = await emailManager.sendEmail(userAccount.accountData.email, userAccount.emailConfirmation.confirmationCode!, messageText );
+            const gmailResponse:SMTPTransport.SentMessageInfo = await emailManager.sendEmail(userAccount.accountData.email, userAccount.emailConfirmation.confirmationCode!, messageText);
+            debugger
         } catch (error) {
+            debugger
             console.error(error);
             await authService.deleteUser(userAccount.id);
-            return res.sendStatus(CodeResponsesEnum.Not_found_404)
+            return null;
         }
-       res.status(CodeResponsesEnum.Not_content_204)
+        res.status(CodeResponsesEnum.Not_content_204)
 });
 authRouter.post('/registration-confirmation', validateRegistrationConfirmationRequests, validateErrorsMiddleware, async (req: Request, res: Response) => {
     const confirmationCode = req.body.confirmationCode;

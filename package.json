@@ -5,8 +5,7 @@
   "license": "MIT",
   "scripts": {
     "dev": "yarn nodemon --inspect dist/index.js",
-    "watch": "tsc -w",
-    "start": "yarn start"
+    "watch": "tsc -w"
   },
   "dependencies": {
     "@types/bcrypt": "^5.0.2",
