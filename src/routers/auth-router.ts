@@ -42,14 +42,12 @@ authRouter.post('/registration',
         Put this conformation code ${userAccount.emailConfirmation.confirmationCode} to correct field`
         try {
             const gmailResponse:SMTPTransport.SentMessageInfo = await emailManager.sendEmail(userAccount.accountData.email, userAccount.emailConfirmation.confirmationCode!, messageText);
-            debugger
         } catch (error) {
-            debugger
             console.error(error);
             await authService.deleteUser(userAccount.id);
             return null;
         }
-        res.status(CodeResponsesEnum.Not_content_204)
+        res.sendStatus(CodeResponsesEnum.Not_content_204)
 });
 authRouter.post('/registration-confirmation', validateRegistrationConfirmationRequests, validateErrorsMiddleware, async (req: Request, res: Response) => {
     const confirmationCode = req.body.confirmationCode;
