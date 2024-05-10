@@ -7,15 +7,16 @@ import {v4 as uuidv4} from 'uuid'
 import {add} from "date-fns/add";
 import {authRepository} from "../repositories/auth-repository";
 import {authQueryRepository} from "../repositories/query-repositories/auth-query-repository";
+import {randomUUID} from "crypto";
+import {emailManager} from "../managers/email-manager";
+import {emailService} from "./email-service";
 export const users = [] as OutputUserType[]
 
 export const authService:any = {
 
     async createUser(login:string, email:string, password:string):Promise<OutputUserAccountType | null> {
-
         const passwordSalt = await bcrypt.genSalt(10);
         const passwordHash = await this._generateHash(password, passwordSalt)
-
         const newUser:UserAccountDBType = {
             _id: new ObjectId(),
             accountData:{
@@ -37,23 +38,46 @@ export const authService:any = {
         const createdAccountUser:OutputUserAccountType | null = await authRepository.createUser(newUser);
         return createdAccountUser;
     },
-   async deleteUser(userID:string): Promise<boolean>{
+    async deleteUser(userID:string): Promise<boolean>{
        return await authRepository.deleteUser(userID);
     },
     async confirmRegistration(confirmationCode:string):Promise<boolean>{
-        const userAccount:WithId<UserAccountDBType> | null = await authQueryRepository.findUserByEmailConfirmationCode(confirmationCode);
+        const userAccount:OutputUserAccountType | null = await authQueryRepository.findUserByEmailConfirmationCode(confirmationCode);
         if (!userAccount) return false;
         if (userAccount.emailConfirmation.isConfirmed) return false;
         if (userAccount.emailConfirmation.confirmationCode !== confirmationCode) return false;
         if (userAccount.emailConfirmation.expirationDate < new Date()) return false;
 
-        const result = await authRepository.updateConfirmation(userAccount._id);
+        const result = await authRepository.updateConfirmation(userAccount.id);
+        return result
+
+    },
+    async updateConfirmationCode(userID:string, confirmationCode:string):Promise<boolean>{
+        const userAccount:OutputUserAccountType | null = await authQueryRepository.findUserByEmailConfirmationCode(confirmationCode);
+        if (!userAccount) return false;
+        if (userAccount.emailConfirmation.isConfirmed) return false;
+        if (userAccount.emailConfirmation.confirmationCode !== confirmationCode) return false;
+        if (userAccount.emailConfirmation.expirationDate < new Date()) return false;
+
+        const result = await authRepository.updateConfirmationCode(userID, confirmationCode);
         return result
 
     },
     async _generateHash(password:string, salt:string):Promise<string>{
         const hash = await bcrypt.hash(password, salt);
         return hash
+    },
+    async resendEmail(email: string): Promise<boolean> {
+        const userAccount: OutputUserAccountType | null = await authQueryRepository.findByLoginOrEmail(email);
+        if (!userAccount || !userAccount.emailConfirmation.confirmationCode) {
+            return false;
+        }
+        const newConfirmationCode:string = randomUUID();
+        await emailService.sendEmail(userAccount, newConfirmationCode)
+        return authService.updateConfirmationCode(
+            userAccount.id,
+            newConfirmationCode
+        );
     }
 
 }

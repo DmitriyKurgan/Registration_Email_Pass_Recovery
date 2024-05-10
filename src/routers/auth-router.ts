@@ -15,6 +15,7 @@ import SMTPTransport from "nodemailer/lib/smtp-transport";
 import {OutputUserAccountType, UserAccountDBType} from "../utils/types";
 import {authQueryRepository} from "../repositories/query-repositories/auth-query-repository";
 import {WithId} from "mongodb";
+import {emailService} from "../services/email-service";
 
 export const authRouter = Router({});
 
@@ -34,23 +35,12 @@ authRouter.post('/registration',
      validateErrorsMiddleware,
     async (req: Request, res: Response) => {
         const userAccount:OutputUserAccountType | null = await authService.createUser(req.body.login, req.body.email, req.body.password);
-        if (!userAccount){
+        if (!userAccount || !userAccount.emailConfirmation.confirmationCode){
           return res.sendStatus(CodeResponsesEnum.Not_found_404)
         }
-        // const messageText = `Hello, ${userAccount.accountData.userName}!
-        // We are pleased to welcome you to our website. All you need to do is to confirm your registration.
-        // Put this conformation code ${userAccount.emailConfirmation.confirmationCode} to correct field`
-
-        const message =  `<h1>Thank for your registration</h1>
-        <p>To finish registration please follow the link below:
-            <a href='https://somesite.com/confirm-email?code=${userAccount.emailConfirmation.confirmationCode}'>complete registration</a>
-        </p>`
-        try {
-            const gmailResponse:SMTPTransport.SentMessageInfo = await emailManager.sendEmail(userAccount.accountData.email, userAccount.emailConfirmation.confirmationCode!, message);
-        } catch (error) {
-            console.error(error);
-            await authService.deleteUser(userAccount.id);
-            return null;
+        const gmailResponse = await emailService.sendEmail(userAccount, userAccount.emailConfirmation.confirmationCode);
+        if(!gmailResponse){
+            return res.sendStatus(CodeResponsesEnum.Not_found_404)
         }
         res.sendStatus(CodeResponsesEnum.Not_content_204)
 });
@@ -63,7 +53,10 @@ authRouter.post('/registration-confirmation', validateRegistrationConfirmationRe
     res.sendStatus(CodeResponsesEnum.Not_content_204);
 });
 authRouter.post('/registration-email-resending', validateEmailResendingRequests, validateErrorsMiddleware, async (req: Request, res: Response) => {
-
+    const userEmail = req.body.email;
+    const confirmationCodeUpdatingResult = authService.resendEmail(userEmail);
+    if (!confirmationCodeUpdatingResult) return;
+    res.sendStatus(CodeResponsesEnum.Not_content_204);
 });
 
 authRouter.get('/me', authMiddleware, async (req: Request, res: Response) => {
