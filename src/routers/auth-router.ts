@@ -9,12 +9,8 @@ import {
 } from "../middlewares/middlewares";
 import {jwtService} from "../application/jwt-service";
 import {usersQueryRepository} from "../repositories/query-repositories/users-query-repository";
-import { emailManager} from "../managers/email-manager";
 import {authService} from "../services/auth-service";
-import SMTPTransport from "nodemailer/lib/smtp-transport";
-import {OutputUserAccountType, UserAccountDBType} from "../utils/types";
-import {authQueryRepository} from "../repositories/query-repositories/auth-query-repository";
-import {WithId} from "mongodb";
+import {OutputUserAccountType} from "../utils/types";
 import {emailService} from "../services/email-service";
 
 export const authRouter = Router({});
@@ -53,8 +49,9 @@ authRouter.post('/registration-confirmation', validateRegistrationConfirmationRe
     res.sendStatus(CodeResponsesEnum.Not_content_204);
 });
 authRouter.post('/registration-email-resending', validateEmailResendingRequests, validateErrorsMiddleware, async (req: Request, res: Response) => {
+    debugger
     const userEmail = req.body.email;
-    const confirmationCodeUpdatingResult = authService.resendEmail(userEmail);
+    const confirmationCodeUpdatingResult = await authService.resendEmail(userEmail);
     if (!confirmationCodeUpdatingResult) return;
     res.sendStatus(CodeResponsesEnum.Not_content_204);
 });

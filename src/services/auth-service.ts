@@ -8,7 +8,6 @@ import {add} from "date-fns/add";
 import {authRepository} from "../repositories/auth-repository";
 import {authQueryRepository} from "../repositories/query-repositories/auth-query-repository";
 import {randomUUID} from "crypto";
-import {emailManager} from "../managers/email-manager";
 import {emailService} from "./email-service";
 export const users = [] as OutputUserType[]
 
@@ -52,14 +51,8 @@ export const authService:any = {
         return result
 
     },
-    async updateConfirmationCode(userID:string, confirmationCode:string):Promise<boolean>{
-        const userAccount:OutputUserAccountType | null = await authQueryRepository.findUserByEmailConfirmationCode(confirmationCode);
-        if (!userAccount) return false;
-        if (userAccount.emailConfirmation.isConfirmed) return false;
-        if (userAccount.emailConfirmation.confirmationCode !== confirmationCode) return false;
-        if (userAccount.emailConfirmation.expirationDate < new Date()) return false;
-
-        const result = await authRepository.updateConfirmationCode(userID, confirmationCode);
+    async updateConfirmationCode(userAccount:OutputUserAccountType, confirmationCode:string):Promise<boolean>{
+        const result = await authRepository.updateConfirmationCode(userAccount.id, confirmationCode);
         return result
 
     },
@@ -68,6 +61,7 @@ export const authService:any = {
         return hash
     },
     async resendEmail(email: string): Promise<boolean> {
+        debugger
         const userAccount: OutputUserAccountType | null = await authQueryRepository.findByLoginOrEmail(email);
         if (!userAccount || !userAccount.emailConfirmation.confirmationCode) {
             return false;
@@ -75,7 +69,7 @@ export const authService:any = {
         const newConfirmationCode:string = randomUUID();
         await emailService.sendEmail(userAccount, newConfirmationCode)
         return authService.updateConfirmationCode(
-            userAccount.id,
+            userAccount,
             newConfirmationCode
         );
     }
