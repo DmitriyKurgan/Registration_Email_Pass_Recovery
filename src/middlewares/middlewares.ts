@@ -198,6 +198,16 @@ export const validateEmailResendingRequests = [
         .withMessage("Email must be in correct format")
 ]
 
+export const validationEmailResend = body("email").custom(async (value) => {
+    const user = await authQueryRepository.findByLoginOrEmail(value);
+    if (!user || user.emailConfirmation.isConfirmed) {
+        throw new Error(
+            "User with provided email not found or is already confirmed"
+        );
+    }
+    return true;
+});
+
 export const validationBlogsFindByParamId = param("id").custom(
     async (value) => {
         const result = await blogsQueryRepository.findBlogByID(value);

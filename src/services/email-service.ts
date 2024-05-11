@@ -14,6 +14,7 @@ export const users = [] as OutputUserType[]
 
 export const emailService:any = {
     async sendEmail(userAccount:OutputUserAccountType, confirmationCode:string):Promise<SMTPTransport.SentMessageInfo | null> {
+        debugger
         const message =  `<h1>Thank for your registration</h1>
         <p>To finish registration please follow the link below:
             <a href='https://somesite.com/confirm-email?code=${confirmationCode}'>complete registration</a>
@@ -23,7 +24,7 @@ export const emailService:any = {
             return gmailResponse
         } catch (error) {
             console.error(error);
-            await authService.deleteUser(userAccount.id);
+           // await authService.deleteUser(userAccount.id);
             return null;
         }
     },

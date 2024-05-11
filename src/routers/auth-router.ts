@@ -5,7 +5,7 @@ import {
     authMiddleware,
     validateAuthRequests, validateEmailResendingRequests,
     validateErrorsMiddleware, validateRegistrationConfirmationRequests,
-    validateUsersRequests, validationUserUnique
+    validateUsersRequests, validationEmailResend, validationUserUnique
 } from "../middlewares/middlewares";
 import {jwtService} from "../application/jwt-service";
 import {usersQueryRepository} from "../repositories/query-repositories/users-query-repository";
@@ -40,7 +40,7 @@ authRouter.post('/registration',
         }
         res.sendStatus(CodeResponsesEnum.Not_content_204)
 });
-authRouter.post('/registration-confirmation', validateRegistrationConfirmationRequests, validateErrorsMiddleware, async (req: Request, res: Response) => {
+authRouter.post('/registration-confirmation', validateRegistrationConfirmationRequests,validationEmailResend, validateErrorsMiddleware, async (req: Request, res: Response) => {
     const confirmationCode = req.body.confirmationCode;
     const confirmationResult = authService.confirmRegistration(confirmationCode);
     if (!confirmationResult){
@@ -52,6 +52,7 @@ authRouter.post('/registration-email-resending', validateEmailResendingRequests,
     debugger
     const userEmail = req.body.email;
     const confirmationCodeUpdatingResult = await authService.resendEmail(userEmail);
+    debugger
     if (!confirmationCodeUpdatingResult) return;
     res.sendStatus(CodeResponsesEnum.Not_content_204);
 });
