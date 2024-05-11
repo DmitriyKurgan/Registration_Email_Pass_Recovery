@@ -12,11 +12,11 @@ import {usersQueryRepository} from "../repositories/query-repositories/users-que
 import {authService} from "../services/auth-service";
 import {OutputUserAccountType} from "../utils/types";
 import {emailService} from "../services/email-service";
-import {debug} from "util";
 
 export const authRouter = Router({});
 
 authRouter.post('/login', validateAuthRequests, validateErrorsMiddleware, async (req: Request, res: Response) => {
+    debugger
      const user = await usersService.checkCredentials(req.body.loginOrEmail, req.body.password)
       if (!user){
           return res.sendStatus(CodeResponsesEnum.Unauthorized_401)

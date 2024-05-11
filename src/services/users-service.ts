@@ -1,8 +1,9 @@
-import {OutputUserType, UserDBType} from "../utils/types";
+import {OutputUserAccountType, OutputUserType, UserAccountDBType, UserDBType} from "../utils/types";
 import {usersRepository} from "../repositories/users-repository";
 import bcrypt from 'bcrypt'
 import {ObjectId, WithId} from "mongodb";
 import {usersQueryRepository} from "../repositories/query-repositories/users-query-repository";
+import {authQueryRepository} from "../repositories/query-repositories/auth-query-repository";
 export const users = [] as OutputUserType[]
 
 export const usersService:any = {
@@ -26,13 +27,13 @@ export const usersService:any = {
    async deleteUser(userID:string): Promise<boolean>{
        return await usersRepository.deleteUser(userID);
     },
-    async checkCredentials(loginOrEmail:string, password:string):Promise<WithId<UserDBType> | null>{
-        const user:WithId<UserDBType> | null = await usersQueryRepository.findByLoginOrEmail(loginOrEmail);
+    async checkCredentials(loginOrEmail:string, password:string):Promise<OutputUserAccountType | null>{
+        const user:OutputUserAccountType | null = await authQueryRepository.findByLoginOrEmail(loginOrEmail);
         if (!user){
             return null
         }
-        const passwordHash = await this._generateHash(password, user.passwordSalt);
-        if (user.passwordHash !== passwordHash){
+        const passwordHash = await this._generateHash(password, user.accountData.passwordSalt);
+        if (user.accountData.passwordHash !== passwordHash){
             return null
         }
         return user
