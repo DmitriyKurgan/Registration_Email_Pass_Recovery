@@ -40,7 +40,7 @@ authRouter.post('/registration',
         }
         res.sendStatus(CodeResponsesEnum.Not_content_204)
 });
-authRouter.post('/registration-confirmation', validateRegistrationConfirmationRequests,validationEmailResend, validateErrorsMiddleware, async (req: Request, res: Response) => {
+authRouter.post('/registration-confirmation', validateRegistrationConfirmationRequests, validationEmailResend, validateErrorsMiddleware, async (req: Request, res: Response) => {
     const confirmationCode = req.body.confirmationCode;
     const confirmationResult = authService.confirmRegistration(confirmationCode);
     if (!confirmationResult){
@@ -48,7 +48,7 @@ authRouter.post('/registration-confirmation', validateRegistrationConfirmationRe
     }
     res.sendStatus(CodeResponsesEnum.Not_content_204);
 });
-authRouter.post('/registration-email-resending', validateEmailResendingRequests, validateErrorsMiddleware, async (req: Request, res: Response) => {
+authRouter.post('/registration-email-resending', validateEmailResendingRequests, validationEmailResend, validateErrorsMiddleware, async (req: Request, res: Response) => {
     debugger
     const userEmail = req.body.email;
     const confirmationCodeUpdatingResult = await authService.resendEmail(userEmail);
