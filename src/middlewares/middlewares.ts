@@ -209,6 +209,19 @@ export const validationEmailResend = body("email").custom(async (value) => {
     return true;
 });
 
+export const validationEmailConfirm = body("code").custom(async (value) => {
+    const user = await authQueryRepository.findUserByEmailConfirmationCode(value);
+    if (
+        !user ||
+        user.emailConfirmation.isConfirmed ||
+        user.emailConfirmation.confirmationCode !== value ||
+        user.emailConfirmation.expirationDate! < new Date()
+    ) {
+        throw new Error("Confirmation code is incorrect");
+    }
+    return true;
+});
+
 export const validationBlogsFindByParamId = param("id").custom(
     async (value) => {
         const result = await blogsQueryRepository.findBlogByID(value);
