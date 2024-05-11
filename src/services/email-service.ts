@@ -21,6 +21,7 @@ export const emailService:any = {
         </p>`
         try {
             const gmailResponse:SMTPTransport.SentMessageInfo = await emailManager.sendEmail(userAccount.accountData.email, message);
+            console.log('confirmationCode:', confirmationCode)
             return gmailResponse
         } catch (error) {
             console.error(error);

@@ -12,6 +12,7 @@ import {usersQueryRepository} from "../repositories/query-repositories/users-que
 import {authService} from "../services/auth-service";
 import {OutputUserAccountType} from "../utils/types";
 import {emailService} from "../services/email-service";
+import {debug} from "util";
 
 export const authRouter = Router({});
 
@@ -45,7 +46,7 @@ authRouter.post('/registration-confirmation',
     validationEmailConfirm,
     validateErrorsMiddleware,
     async (req: Request, res: Response) => {
-    const confirmationCode = req.body.confirmationCode;
+    const confirmationCode = req.body.code;
     const confirmationResult = authService.confirmRegistration(confirmationCode);
     if (!confirmationResult){
         return res.sendStatus(CodeResponsesEnum.Incorrect_values_400);
