@@ -16,7 +16,3 @@ const startsApp = async () =>{
 }
 
 startsApp();
-
-
-
-

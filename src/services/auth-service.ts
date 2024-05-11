@@ -13,7 +13,7 @@ export const users = [] as OutputUserType[]
 
 export const authService:any = {
 
-    async createUser(login:string, email:string, password:string):Promise<OutputUserAccountType | null> {
+    async registerUser(login:string, email:string, password:string):Promise<OutputUserAccountType | null> {
         const passwordSalt = await bcrypt.genSalt(10);
         const passwordHash = await this._generateHash(password, passwordSalt)
         const newUser:UserAccountDBType = {
@@ -61,7 +61,6 @@ export const authService:any = {
         return hash
     },
     async resendEmail(email: string): Promise<boolean> {
-        debugger
         const userAccount: OutputUserAccountType | null = await authQueryRepository.findByLoginOrEmail(email);
         if (!userAccount || !userAccount.emailConfirmation.confirmationCode) {
             return false;

@@ -30,7 +30,7 @@ authRouter.post('/registration',
      validationUserUnique("login"),
      validateErrorsMiddleware,
     async (req: Request, res: Response) => {
-        const userAccount:OutputUserAccountType | null = await authService.createUser(req.body.login, req.body.email, req.body.password);
+        const userAccount:OutputUserAccountType | null = await authService.registerUser(req.body.login, req.body.email, req.body.password);
         if (!userAccount || !userAccount.emailConfirmation.confirmationCode){
           return res.sendStatus(CodeResponsesEnum.Not_found_404)
         }
@@ -40,7 +40,7 @@ authRouter.post('/registration',
         }
         res.sendStatus(CodeResponsesEnum.Not_content_204)
 });
-authRouter.post('/registration-confirmation', validateRegistrationConfirmationRequests, validationEmailResend, validateErrorsMiddleware, async (req: Request, res: Response) => {
+authRouter.post('/registration-confirmation', validateRegistrationConfirmationRequests, validateErrorsMiddleware, async (req: Request, res: Response) => {
     const confirmationCode = req.body.confirmationCode;
     const confirmationResult = authService.confirmRegistration(confirmationCode);
     if (!confirmationResult){
