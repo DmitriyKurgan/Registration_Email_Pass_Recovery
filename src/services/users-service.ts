@@ -1,9 +1,10 @@
-import {OutputUserAccountType, OutputUserType, UserAccountDBType, UserDBType} from "../utils/types";
+import {OutputUserType, UserDBType} from "../utils/types";
 import {usersRepository} from "../repositories/users-repository";
 import bcrypt from 'bcrypt'
-import {ObjectId, WithId} from "mongodb";
+import {ObjectId} from "mongodb";
 import {usersQueryRepository} from "../repositories/query-repositories/users-query-repository";
-import {authQueryRepository} from "../repositories/query-repositories/auth-query-repository";
+import {v4 as uuidv4} from "uuid";
+import {add} from "date-fns/add";
 export const users = [] as OutputUserType[]
 
 export const usersService:any = {
@@ -12,14 +13,23 @@ export const usersService:any = {
 
         const passwordSalt = await bcrypt.genSalt(10);
         const passwordHash = await this._generateHash(password, passwordSalt)
-
         const newUser:UserDBType = {
             _id: new ObjectId(),
-            login,
-            email,
-            passwordSalt,
-            passwordHash,
-            createdAt: new Date()
+            accountData:{
+                userName:login,
+                email,
+                passwordHash,
+                passwordSalt,
+                createdAt: new Date(),
+            },
+            emailConfirmation:{
+                confirmationCode:uuidv4(),
+                expirationDate:add(new Date(), {
+                    hours: 3,
+                    minutes: 10
+                }),
+                isConfirmed:false,
+            },
         }
         const createdUser = await usersRepository.createUser(newUser);
         return createdUser;
@@ -27,8 +37,8 @@ export const usersService:any = {
    async deleteUser(userID:string): Promise<boolean>{
        return await usersRepository.deleteUser(userID);
     },
-    async checkCredentials(loginOrEmail:string, password:string):Promise<OutputUserAccountType | null>{
-        const user:OutputUserAccountType | null = await authQueryRepository.findByLoginOrEmail(loginOrEmail);
+    async checkCredentials(loginOrEmail:string, password:string):Promise<OutputUserType | null>{
+        const user:OutputUserType | null = await usersQueryRepository.findByLoginOrEmail(loginOrEmail);
         if (!user){
             return null
         }

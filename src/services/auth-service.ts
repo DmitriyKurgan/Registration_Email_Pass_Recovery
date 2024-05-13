@@ -1,4 +1,4 @@
-import {OutputUserAccountType, OutputUserType, UserAccountDBType, UserDBType} from "../utils/types";
+import {OutputUserType, UserDBType} from "../utils/types";
 import {usersRepository} from "../repositories/users-repository";
 import bcrypt from 'bcrypt'
 import {ObjectId, WithId} from "mongodb";
@@ -13,10 +13,10 @@ export const users = [] as OutputUserType[]
 
 export const authService:any = {
 
-    async registerUser(login:string, email:string, password:string):Promise<OutputUserAccountType | null> {
+    async registerUser(login:string, email:string, password:string):Promise<OutputUserType | null> {
         const passwordSalt = await bcrypt.genSalt(10);
         const passwordHash = await this._generateHash(password, passwordSalt)
-        const newUser:UserAccountDBType = {
+        const newUser:UserDBType = {
             _id: new ObjectId(),
             accountData:{
                 userName:login,
@@ -34,14 +34,14 @@ export const authService:any = {
                 isConfirmed:false,
             },
         }
-        const createdAccountUser:OutputUserAccountType | null = await authRepository.createUser(newUser);
+        const createdAccountUser:OutputUserType | null = await authRepository.createUser(newUser);
         return createdAccountUser;
     },
     async deleteUser(userID:string): Promise<boolean>{
        return await authRepository.deleteUser(userID);
     },
     async confirmRegistration(confirmationCode:string):Promise<boolean>{
-        const userAccount:OutputUserAccountType | null = await authQueryRepository.findUserByEmailConfirmationCode(confirmationCode);
+        const userAccount:OutputUserType | null = await authQueryRepository.findUserByEmailConfirmationCode(confirmationCode);
         if (!userAccount) return false;
         if (userAccount.emailConfirmation.isConfirmed) return false;
         if (userAccount.emailConfirmation.confirmationCode !== confirmationCode) return false;
@@ -51,7 +51,7 @@ export const authService:any = {
         return result
 
     },
-    async updateConfirmationCode(userAccount:OutputUserAccountType, confirmationCode:string):Promise<boolean>{
+    async updateConfirmationCode(userAccount:OutputUserType, confirmationCode:string):Promise<boolean>{
         const result = await authRepository.updateConfirmationCode(userAccount.id, confirmationCode);
         return result
 
@@ -61,7 +61,7 @@ export const authService:any = {
         return hash
     },
     async resendEmail(email: string): Promise<boolean> {
-        const userAccount: OutputUserAccountType | null = await authQueryRepository.findByLoginOrEmail(email);
+        const userAccount: OutputUserType | null = await authQueryRepository.findByLoginOrEmail(email);
         if (!userAccount || !userAccount.emailConfirmation.confirmationCode) {
             return false;
         }

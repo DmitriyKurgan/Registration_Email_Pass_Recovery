@@ -24,30 +24,35 @@ export type PostType = {
 export type OutputPostType = PostType & {id:string}
 
 export type UserType = {
-    login: string
-    email: string
-    createdAt: Date | string
-}
-
-export type UserAccountType = {
+    // login: string
+    // email: string
+    // createdAt: Date | string
     accountData: AccountDataType,
     emailConfirmation: EmailConfirmationType
 }
+
+// export type UserAccountType = {
+//     accountData: AccountDataType,
+//     emailConfirmation: EmailConfirmationType
+// }
 
 export type UserDBType = {
-    _id: ObjectId
-    login: string
-    email: string
-    passwordSalt: string
-    passwordHash: string
-    createdAt: Date | string
-}
-
-export type UserAccountDBType = {
+    // _id: ObjectId
+    // login: string
+    // email: string
+    // passwordSalt: string
+    // passwordHash: string
+    // createdAt: Date | string
     _id: ObjectId
     accountData: AccountDataType,
     emailConfirmation: EmailConfirmationType
 }
+
+// export type UserAccountDBType = {
+//     _id: ObjectId
+//     accountData: AccountDataType,
+//     emailConfirmation: EmailConfirmationType
+// }
 
 export type AccountDataType = {
     userName: string
@@ -65,7 +70,7 @@ export type EmailConfirmationType = {
 
 
 export type OutputUserType = UserType & {id:string}
-export type OutputUserAccountType = UserAccountType & {id:string}
+//export type OutputUserAccountType = UserAccountType & {id:string}
 
 export type CommentType = {
     postId?:string

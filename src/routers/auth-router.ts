@@ -10,13 +10,12 @@ import {
 import {jwtService} from "../application/jwt-service";
 import {usersQueryRepository} from "../repositories/query-repositories/users-query-repository";
 import {authService} from "../services/auth-service";
-import {OutputUserAccountType} from "../utils/types";
 import {emailService} from "../services/email-service";
+import {OutputUserType} from "../utils/types";
 
 export const authRouter = Router({});
 
 authRouter.post('/login', validateAuthRequests, validateErrorsMiddleware, async (req: Request, res: Response) => {
-    debugger
      const user = await usersService.checkCredentials(req.body.loginOrEmail, req.body.password)
       if (!user){
           return res.sendStatus(CodeResponsesEnum.Unauthorized_401)
@@ -31,7 +30,7 @@ authRouter.post('/registration',
      validationUserUnique("login"),
      validateErrorsMiddleware,
     async (req: Request, res: Response) => {
-        const userAccount:OutputUserAccountType | null = await authService.registerUser(req.body.login, req.body.email, req.body.password);
+        const userAccount:OutputUserType | null = await authService.registerUser(req.body.login, req.body.email, req.body.password);
         if (!userAccount || !userAccount.emailConfirmation.confirmationCode){
           return res.sendStatus(CodeResponsesEnum.Not_found_404)
         }
@@ -75,8 +74,8 @@ authRouter.get('/me', authMiddleware, async (req: Request, res: Response) => {
         return res.sendStatus(CodeResponsesEnum.Unauthorized_401)
     }
     res.status(CodeResponsesEnum.OK_200).send({
-        email: user.email,
-        login: user.login,
+        email: user.accountData.email,
+        login: user.accountData.userName,
         userId: myID
     })
 });

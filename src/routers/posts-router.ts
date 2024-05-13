@@ -94,7 +94,7 @@ postsRouter.post('/:id/comments',
     if (!user){
         return res.sendStatus(CodeResponsesEnum.Unauthorized_401);
     }
-    const newComment: OutputCommentType| null = await commentsService.createComment(req.body, post.id, req.userId, user.login);
+    const newComment: OutputCommentType| null = await commentsService.createComment(req.body, post.id, req.userId, user.accountData.userName);
     if (!newComment) {
         return
     }

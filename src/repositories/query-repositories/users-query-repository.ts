@@ -6,9 +6,8 @@ import {usersCollection} from "../db";
 export const UserMapper = (user : WithId<UserDBType>) : OutputUserType => {
     return {
         id: user._id.toString(),
-        login: user.login,
-        email: user.email,
-        createdAt: user.createdAt
+        accountData:{...user.accountData},
+        emailConfirmation:{...user.emailConfirmation},
     }
 }
 
@@ -19,7 +18,7 @@ export const usersQueryRepository = {
     },
     async findByLoginOrEmail(loginOrEmail:string){
         const user = await usersCollection.findOne({$or: [{login:loginOrEmail}, {email:loginOrEmail}]})
-        return user
+        return user ? UserMapper(user) : null
 },
     async findUserByID(userID:string){
         const user = await usersCollection.findOne({_id: new ObjectId(userID)})

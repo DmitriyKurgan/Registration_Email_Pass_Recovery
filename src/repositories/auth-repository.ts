@@ -1,25 +1,25 @@
-import {usersAccoutsCollection} from "./db";
 import {InsertOneResult, ObjectId, DeleteResult, UpdateResult} from "mongodb";
-import {OutputUserAccountType, OutputUserType, UserAccountDBType} from "../utils/types";
-import {UserAccountMapper} from "./query-repositories/auth-query-repository";
+import {OutputUserType, UserDBType} from "../utils/types";
+import {usersCollection} from "./db";
+import {UserMapper} from "./query-repositories/users-query-repository";
 
 export const authRepository = {
-    async createUser(newUser:UserAccountDBType):Promise<OutputUserAccountType | null> {
-        const result:InsertOneResult<UserAccountDBType> = await usersAccoutsCollection.insertOne(newUser);
-        const user: UserAccountDBType| null = await usersAccoutsCollection.findOne({_id: result.insertedId});
-        return user ? UserAccountMapper(user) : null;
+    async createUser(newUser:UserDBType):Promise<OutputUserType | null> {
+        const result:InsertOneResult<UserDBType> = await usersCollection.insertOne(newUser);
+        const user: UserDBType| null = await usersCollection.findOne({_id: result.insertedId});
+        return user ? UserMapper(user) : null;
     },
    async deleteUser(userID:string): Promise<boolean>{
-        const result: DeleteResult = await usersAccoutsCollection.deleteOne({_id:new ObjectId(userID)});
+        const result: DeleteResult = await usersCollection.deleteOne({_id:new ObjectId(userID)});
         return result.deletedCount === 1
     },
     async updateConfirmation(userID:string):Promise<boolean>{
-        const result: UpdateResult = await usersAccoutsCollection.updateOne({_id:new ObjectId(userID)},
+        const result: UpdateResult = await usersCollection.updateOne({_id:new ObjectId(userID)},
             {$set:{'emailConfirmation.isConfirmed':true}});
         return result.matchedCount === 1
     },
     async updateConfirmationCode(userID:string, confirmationCode:string):Promise<boolean>{
-        const result: UpdateResult = await usersAccoutsCollection.updateOne({_id:new ObjectId(userID)},
+        const result: UpdateResult = await usersCollection.updateOne({_id:new ObjectId(userID)},
             {$set:{'emailConfirmation.confirmationCode':confirmationCode}});
         return result.matchedCount === 1
     }
