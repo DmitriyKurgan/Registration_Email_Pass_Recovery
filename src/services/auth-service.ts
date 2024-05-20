@@ -12,31 +12,6 @@ import {emailService} from "./email-service";
 export const users = [] as OutputUserType[]
 
 export const authService:any = {
-
-    // async registerUser(login:string, email:string, password:string):Promise<OutputUserType | null> {
-    //     const passwordSalt = await bcrypt.genSalt(10);
-    //     const passwordHash = await this._generateHash(password, passwordSalt)
-    //     const newUser:UserDBType = {
-    //         _id: new ObjectId(),
-    //         accountData:{
-    //             userName:login,
-    //             email,
-    //             passwordHash,
-    //             passwordSalt,
-    //             createdAt: new Date(),
-    //         },
-    //         emailConfirmation:{
-    //             confirmationCode:uuidv4(),
-    //             expirationDate:add(new Date(), {
-    //                 hours: 3,
-    //                 minutes: 10
-    //             }),
-    //             isConfirmed:false,
-    //         },
-    //     }
-    //     const createdAccountUser:OutputUserType | null = await authRepository.createUser(newUser);
-    //     return createdAccountUser;
-    // },
     async deleteUser(userID:string): Promise<boolean>{
        return await authRepository.deleteUser(userID);
     },

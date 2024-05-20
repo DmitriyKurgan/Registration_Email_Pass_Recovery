@@ -88,7 +88,6 @@ postsRouter.post('/:id/comments',
         return res.sendStatus(CodeResponsesEnum.Not_found_404);
     }
     const user = await usersQueryRepository.findUserByID(req.userId!)
-
     const newComment: OutputCommentType| null = await commentsService.createComment(req.body, post.id, req.userId, user!.accountData.userName);
     if (!newComment) {
         return

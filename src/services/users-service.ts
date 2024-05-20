@@ -39,12 +39,10 @@ export const usersService:any = {
     },
     async checkCredentials(loginOrEmail:string, password:string):Promise<OutputUserType | null> {
         const user:OutputUserType | null = await usersQueryRepository.findByLoginOrEmail(loginOrEmail);
-        console.log('USER: ', user)
         if (!user){
             return null
         }
         const passwordHash = await this._generateHash(password, user.accountData.passwordSalt);
-        console.log('passwordHASH: ', passwordHash)
         if (user.accountData.passwordHash !== passwordHash){
             return null
         }
