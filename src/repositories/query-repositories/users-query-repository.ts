@@ -17,7 +17,7 @@ export const usersQueryRepository = {
         return getUsersFromDB(query);
     },
     async findByLoginOrEmail(loginOrEmail:string){
-        const user = await usersCollection.findOne({$or: [{login:loginOrEmail}, {email:loginOrEmail}]})
+        const user = await usersCollection.findOne({$or: [{"accountData.userName":loginOrEmail}, {"accountData.email":loginOrEmail}]})
         return user ? UserMapper(user) : null
 },
     async findUserByID(userID:string){

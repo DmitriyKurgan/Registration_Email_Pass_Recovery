@@ -1,13 +1,13 @@
-import {AccessTokenType, UserDBType} from "../utils/types";
+import {AccessTokenType, OutputUserType, UserDBType, UserType} from "../utils/types";
 import {ObjectId} from "mongodb";
 import jwt from 'jsonwebtoken';
 import {settings} from "../settings";
 
 export const jwtService:any = {
 
-    async createJWT(user:UserDBType):Promise<AccessTokenType> {
+    async createJWT(user:OutputUserType):Promise<AccessTokenType> {
         const accessToken = {
-            accessToken:  jwt.sign({userId:user._id}, settings.JWT_SECRET, {expiresIn:'90h'})
+            accessToken:  jwt.sign({userId:user.id}, settings.JWT_SECRET, {expiresIn:'90h'})
         }
         return accessToken
     },

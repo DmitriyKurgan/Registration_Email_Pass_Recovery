@@ -10,8 +10,8 @@ export const users = [] as OutputUserType[]
 export const usersService:any = {
 
     async createUser(login:string, email:string, password:string):Promise<OutputUserType | null> {
-
         const passwordSalt = await bcrypt.genSalt(10);
+        console.log('passwordSalt: ', passwordSalt)
         const passwordHash = await this._generateHash(password, passwordSalt)
         const newUser:UserDBType = {
             _id: new ObjectId(),
@@ -37,15 +37,18 @@ export const usersService:any = {
    async deleteUser(userID:string): Promise<boolean>{
        return await usersRepository.deleteUser(userID);
     },
-    async checkCredentials(loginOrEmail:string, password:string):Promise<OutputUserType | null>{
+    async checkCredentials(loginOrEmail:string, password:string):Promise<OutputUserType | null> {
         const user:OutputUserType | null = await usersQueryRepository.findByLoginOrEmail(loginOrEmail);
+        console.log('USER: ', user)
         if (!user){
             return null
         }
         const passwordHash = await this._generateHash(password, user.accountData.passwordSalt);
+        console.log('passwordHASH: ', passwordHash)
         if (user.accountData.passwordHash !== passwordHash){
             return null
         }
+
         return user
     },
     async _generateHash(password:string, salt:string):Promise<string>{

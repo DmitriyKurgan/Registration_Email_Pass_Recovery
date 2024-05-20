@@ -87,14 +87,9 @@ postsRouter.post('/:id/comments',
     if (!post){
         return res.sendStatus(CodeResponsesEnum.Not_found_404);
     }
-    if (!req.userId){
-        return res.sendStatus(CodeResponsesEnum.Unauthorized_401);
-    }
-    const user = await usersQueryRepository.findUserByID(req?.userId)
-    if (!user){
-        return res.sendStatus(CodeResponsesEnum.Unauthorized_401);
-    }
-    const newComment: OutputCommentType| null = await commentsService.createComment(req.body, post.id, req.userId, user.accountData.userName);
+    const user = await usersQueryRepository.findUserByID(req.userId!)
+
+    const newComment: OutputCommentType| null = await commentsService.createComment(req.body, post.id, req.userId, user!.accountData.userName);
     if (!newComment) {
         return
     }
